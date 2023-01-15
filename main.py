@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import PIL
 import tensorflow as tf
+import os
 
 from tensorflow import keras
 
@@ -82,29 +83,27 @@ model.add(Dense(units = 4, activation = 'softmax'))
 
 model.compile(loss='categorical_crossentropy',metrics=['accuracy'],optimizer='adam')
 
+# Save the model
+
+checkpoint_path = "model_save/training_1/cp.ckpt"
+checkpoint_dir = os.path.dirname(checkpoint_path)
+cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,save_weights_only=True,verbose=1, save_best_only=True)
+
 #Train the model
 
-model.fit(ds_train, epochs=10, validation_data=ds_validation)
+model.fit(ds_train, epochs=5, validation_data=ds_validation, callbacks=[cp_callback])
 
+# Test the model
 
-# img = Image.open('datasets/sunrise325.jpg')
+img = tf.keras.utils.load_img('datasets/test/weather/sunrise.png', target_size=(384, 256))
+img_array = tf.keras.utils.img_to_array(img)
+img_array = tf.expand_dims(img_array, 0) # Create a batch
 
-# img.resize((384,256), Image.ANTIALIAS).save('datasets/sunrise325_greyscale.png')
-# listsize = []
-# for image in os.listdir('datasets/weather/'):
-#     if image.endswith('.jpg'):
-#         img = Image.open('datasets/weather/'+image)
-#         listsize.append(img.size)
-#         # img.resize((256,256), Image.ANTIALIAS).save('datasets/'+image[:-4]+'_greyscale.png')
+predictions = model.predict(img_array)
+print(predictions)
+score = tf.nn.softmax(predictions[0])
 
-# # print the mean size of the images
-# listwidth = []
-# listheight = []
-# for i in listsize:
-#     listwidth.append(i[0])
-#     listheight.append(i[1])
-
-# print('mean width: ', sum(listwidth)/len(listwidth))
-# print('mean height: ', sum(listheight)/len(listheight))
-
-# print(503/332)
+print(
+    "This image most likely belongs to {} with a {:.2f} percent confidence."
+    .format(class_names[np.argmax(score)], 100 * np.max(score))
+)
