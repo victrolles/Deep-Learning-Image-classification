@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
-from tensorflow.python.keras.layers import Dense, Flatten
+from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D
 from tensorflow.python.keras.models import Sequential
 
 TRAINING = False
@@ -10,7 +10,7 @@ TRAINING = False
 class Classifier:
     def __init__(self):
         # assign save location
-        self.checkpoint_path = "model_save/training_1/cp.ckpt"
+        self.checkpoint_path = "model_save/training_2/cp.ckpt"
         self.cp_callback = None
         
         # image size
@@ -80,7 +80,15 @@ class Classifier:
 
     def create_model(self):
         self.model = Sequential()
-        self.model.add(Flatten(input_shape=(self.img_height, self.img_width, 3)))
+        self.model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(self.img_height, self.img_width, 3)))
+        self.model.add(MaxPooling2D((2, 2)))
+        self.model.add(Conv2D(64, (3, 3), activation='relu'))
+        self.model.add(MaxPooling2D((2, 2)))
+        self.model.add(Conv2D(128, (3, 3), activation='relu'))
+        self.model.add(MaxPooling2D((2, 2)))
+        self.model.add(Conv2D(128, (3, 3), activation='relu'))
+        self.model.add(MaxPooling2D((2, 2)))
+        self.model.add(Flatten())
         self.model.add(Dense(units = 512, activation = 'relu'))
         self.model.add(Dense(units = 512, activation = 'relu'))
         self.model.add(Dense(units = len(self.class_names), activation = 'softmax'))
