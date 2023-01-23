@@ -10,7 +10,7 @@ TRAINING = False
 class Classifier:
     def __init__(self):
         # assign save location
-        self.checkpoint_path = "model_save/training_2/cp.ckpt"
+        self.checkpoint_path = "model_save/CNN/cp.ckpt"
         self.cp_callback = None
         
         # image size
@@ -78,6 +78,12 @@ class Classifier:
         self.ds_train = self.ds_train.map(lambda x, y: (self.normalization_layer(x), y))
         self.ds_validation = self.ds_validation.map(lambda x, y: (self.normalization_layer(x), y))
 
+    # Cache data to improve performance
+    def cache_data(self):
+        AUTOTUNE = tf.data.experimental.AUTOTUNE
+        self.ds_train = self.ds_train.cache().prefetch(buffer_size=AUTOTUNE)
+        self.ds_validation = self.ds_validation.cache().prefetch(buffer_size=AUTOTUNE)
+
     def create_model(self):
         self.model = Sequential()
         self.model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(self.img_height, self.img_width, 3)))
@@ -118,7 +124,9 @@ class Classifier:
 if __name__ == "__main__":
     classifier = Classifier()
     classifier.create_dataset()
+    classifier.visualize_data()
     classifier.normalize_data()
+    classifier.visualize_data()
     classifier.create_model()
     
     if TRAINING:

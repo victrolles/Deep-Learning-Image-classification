@@ -10,7 +10,7 @@ TRAINING = False
 class Classifier:
     def __init__(self):
         # assign save location
-        self.checkpoint_path = "model_save/training_1/cp.ckpt"
+        self.checkpoint_path = "model_save/FCL/cp.ckpt"
         self.cp_callback = None
         
         # image size
