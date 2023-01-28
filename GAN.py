@@ -50,6 +50,7 @@ class GAN:
             seed=123,
         )
         print(len(np.concatenate([i for x, i in self.dataset], axis=0)))
+        print("len(self.dataset)", len(self.dataset))
         for idx, (real_images, labels) in enumerate(self.dataset):
             print("idx", idx)
         self.class_names = self.dataset.class_names
